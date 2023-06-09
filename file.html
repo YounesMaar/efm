@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Online Store</title>
+    <style>
+      /* CSS styles for the online store */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      header {
+        background-color: #333;
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+      }
+
+      h1 {
+        margin: 0;
+      }
+
+      nav {
+        background-color: #f5f5f5;
+        padding: 10px;
+      }
+
+      nav ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      nav li {
+        display: inline;
+        margin-right: 10px;
+      }
+
+      section {
+        padding: 20px;
+      }
+
+      footer {
+        background-color: #333;
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+      }
+      table {
+        width: 100%;
+        border: 2px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Online Store</h1>
+    </header>
+
+    <nav>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Products</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+
+    <section>
+      <h2>Welcome to our online store!</h2>
+      <p>
+        Explore our wide range of products and find the perfect item for you.
+      </p>
+      <form>
+        <h1>Product</h1>
+        <select id="products" class="products-drop-down">
+          <option></option>
+        </select>
+        <h1>Quantite</h1>
+        <input
+          min="0"
+          max="10"
+          type="number"
+          id="quantite"
+          placeholder="Enter Quantite"
+        />
+        <button onclick="ajouterAuPanier(event) ">Ajoute Au panier</button>
+      </form>
+
+      <h3>Featured Products</h3>
+      <table>
+        <tr>
+          <th>Reference</th>
+          <th>Quantite</th>
+          <th>Img</th>
+          <th>Action</th>
+        </tr>
+      </table>
+      <div style="display: flex; justify-content: space-evenly; margin: 20px">
+        Total HT
+        <div><span class="ht">0</span>DH</div>
+      </div>
+      <div style="display: flex; justify-content: space-evenly; margin: 20px 0">
+        Total TTC
+        <div><span class="ttc">0</span>DH</div>
+      </div>
+    </section>
+
+    <footer>&copy; 2023 Online Store. All rights reserved.</footer>
+    <script>
+      const select = document.querySelector(".products-drop-down");
+
+      function remplir() {
+        fetch("http://localhost:3000/products")
+          .then((res) => res.json())
+          .then((res) => {
+            res.map((product) => {
+              // creating element
+              let option = document.createElement("option");
+              //
+              option.value = product.name;
+              option.appendChild(document.createTextNode(product.name));
+              // appending to select
+              select.appendChild(option);
+            });
+          });
+      }
+
+      remplir();
+
+      function ajouterAuPanier(event) {
+        // TO PREVENT THE DATA WICH IS GOIN TO THE SERVER
+        event.preventDefault();
+        // SELECTING THE PRODUCT NAME
+        const product = document.querySelector(".products-drop-down");
+        const prod = product.value;
+        const quantite = document.querySelector("#quantite");
+        const quan = quantite.value;
+        // GET REQUEST
+        fetch(`http://localhost:3000/products?name=` + prod)
+          .then(function (res) {
+            return res.json();
+          })
+          .then((res) => {
+            console.log(res[0]);
+            const data = {
+              Reference: res[0].name,
+              price: res[0].price,
+              Quantite: quan,
+              img: res[0].image,
+            };
+            // POST REQUEST
+            fetch("http://localhost:3000/cart", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json", // Set the appropriate content type
+              },
+              body: JSON.stringify(data),
+            })
+              .then((res) => {
+                console.log("success");
+                removeAllRows();
+                getMyData();
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          });
+      }
+      // HANDLERES
+      // REMOVE ALL ROWS BEFORE GETTING THE NEW COLLECTION
+      function removeAllRows() {
+        const row = Array.from(document.querySelectorAll(".row"));
+        row.map((r) => {
+          r.remove();
+        });
+      }
+      // DELETE ONE ROW
+      // WICH WE CALL ON 'SUPRIMER' BUTTON
+      function deleteRow(id) {
+        fetch("http://localhost:3000/cart/" + id, {
+          method: "DELETE",
+        }).then((res) => {
+          removeAllRows();
+          getMyData();
+        });
+      }
+      // PRICE OF THE ENTIER COLLECTION CARD
+      // GETTING MY DATA
+
+      async function getMyData() {
+        await fetch("http://localhost:3000/cart")
+          .then((res) => res.json())
+          .then((res) => {
+            // TOTAL PRICE HANDLING
+            let ht = 0;
+            let table = document.querySelector("table");
+            let totalPrice = document.querySelector(".ht");
+            let TTC = document.querySelector(".ttc");
+            if (res.length == 0) {
+              totalPrice.innerHTML = 0;
+              TTC.innerHTML = "0";
+            }
+            res.map((product) => {
+              ht += product.price * parseFloat(product.Quantite);
+
+              totalPrice.innerHTML = ht;
+              TTC.innerHTML = parseInt(ht * 0.2 + ht);
+              // DECLARING THE NEEDED VARIABLES
+              let ref, Quan, Img, Action, tr, img;
+              // CREATING THE TABLE CELLS
+              tr = document.createElement("tr");
+              tr.className = "row";
+              ref = document.createElement("td");
+              Quan = document.createElement("td");
+              Img = document.createElement("td");
+              Action = document.createElement("td");
+              img = document.createElement("img");
+              img.setAttribute("src", product.img);
+              img.style.cssText = "width: 100px";
+              // CREATING THE CONTENT OF EACH CELL
+              ref.appendChild(document.createTextNode(product.Reference));
+              Quan.appendChild(document.createTextNode(product.Quantite));
+              Img.appendChild(img);
+              let button = document.createElement("button");
+              button.appendChild(document.createTextNode("supprimer"));
+              button.addEventListener("click", () => {
+                deleteRow(product.id);
+              });
+              Action.appendChild(button);
+              // appending childs to the table
+              tr.appendChild(ref);
+              tr.appendChild(Quan);
+              tr.appendChild(Img);
+              tr.appendChild(Action);
+
+              table.appendChild(tr);
+            });
+          });
+      }
+      getMyData();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "PS5",
+      "price": 1900.99,
+      "image": "https://gmedia.playstation.com/is/image/SIEPDC/hardware-beauty-xs@2x?qlt=87,1&resMode=bilin&fmt=jpg&scl=1"
+    },
+    {
+      "id": 2,
+      "name": "TV",
+      "price": 2009.99,
+      "image": "https://static.vecteezy.com/system/resources/previews/001/881/600/large_2x/realistic-tv-screen-isolated-illustration-with-red-button-lcd-panel-computer-monitor-display-mock-up-4k-television-template-free-vector.jpg"
+    },
+    {
+      "id": 3,
+      "name": "Mac",
+      "price": 2009.99,
+      "image": "https://www.apple.com/v/mac/home/bu/images/overview/compare/compare_mbp_13__b9nj45t4tcya_small_2x.png"
+    },
+    {
+      "id": 4,
+      "name": "hp",
+      "price": 2009.99,
+      "image": "https://www.apple.com/v/mac/home/bu/images/overview/compare/compare_mbp_13__b9nj45t4tcya_small_2x.png"
+    },
+    {
+      "name": "samsong",
+      "price": 200,
+      "image": "http:iphone.com",
+      "id": 5
+    }
+  ],
+  "cart": []
+}
